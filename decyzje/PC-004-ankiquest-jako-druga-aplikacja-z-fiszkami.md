@@ -29,4 +29,4 @@ osiadlo: "android/…/anki/FlashcardApp.kt, ProviderCheck.kt, AndroidInstalledAp
 
 **Uzasadnienie.** AnkiQuest działa z garmanki bez zmian w protokole. Zamknięta lista, zgoda przez systemowe okno uprawnień, wbudowany klucz wydań AnkiDroid i przypięty certyfikat AnkiQuest dodają ochronę, także dla użytkowników samego AnkiDroid.
 
-**Konsekwencje / gdzie osiadło.** AnkiDroid z F-Droid jest podpisany kluczem F-Droid, nie kluczem wydań, i nie przechodzi kontroli, dopóki jego SHA-256 nie zostanie wbudowany obok klucza wydań. android/…/anki/FlashcardApp.kt, ProviderCheck.kt, AndroidInstalledApps.kt, AndroidFlashcardApps.kt, AnkiDroidClient.kt, ekran główny (wybór „Flashcard app”), AndroidManifest.xml, SCHEMA.md §7, README.md.
+**Konsekwencje / gdzie osiadło.** AnkiDroid z F-Droid jest podpisany kluczem F-Droid, nie kluczem wydań; jego SHA-256 (`24A3D475…5906BB`) jest wbudowany obok klucza wydań. android/…/anki/FlashcardApp.kt, ProviderCheck.kt, AndroidInstalledApps.kt, AndroidFlashcardApps.kt, AnkiDroidClient.kt, ekran główny (wybór „Flashcard app”), AndroidManifest.xml, SCHEMA.md §7, README.md.

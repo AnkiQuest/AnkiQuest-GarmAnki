@@ -15,7 +15,7 @@ enum class FlashcardApp(
         "com.ichi2.anki",
         "com.ichi2.anki.flashcards",
         "com.ichi2.anki.permission.READ_WRITE_DATABASE",
-        SigningKey.BuiltIn(ANKIDROID_RELEASE_KEY),
+        SigningKey.BuiltIn(ANKIDROID_KEYS),
     ),
     ANKIQUEST(
         "org.ankiquest.anki",
@@ -34,7 +34,7 @@ enum class FlashcardApp(
 /** How the companion knows an app's signing key. */
 sealed interface SigningKey {
     /** Release key built into the companion. */
-    data class BuiltIn(val sha256: String) : SigningKey
+    data class BuiltIn(val sha256: Set<String>) : SigningKey
 
     /** Not known here: pinned when the user chooses the app. */
     data object PinnedOnChoice : SigningKey
@@ -136,7 +136,7 @@ class FlashcardAppResolver(
 
     /** A built-in key is checked here; a pinned key only once chosen, in [checkPin]. */
     private fun trust(app: FlashcardApp): ProviderTrust = when (val key = app.key) {
-        is SigningKey.BuiltIn -> check.check(app.packageName, app.authority, setOf(key.sha256))
+        is SigningKey.BuiltIn -> check.check(app.packageName, app.authority, key.sha256)
         SigningKey.PinnedOnChoice -> check.holder(app.packageName, app.authority)
     }
 

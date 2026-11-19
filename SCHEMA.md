@@ -148,7 +148,9 @@ If `front` ends up empty → skip the card and count it as `skipped`
   certificates (rotation history included) must match its key.
   AnkiDroid's key is built in: the release SHA-256 (Google Play,
   GitHub)
-  `2071534F0F4B5E54AE952DD275D70DA6E3459EE69909D2AB1B4843C4C5B21A45`;
+  `2071534F0F4B5E54AE952DD275D70DA6E3459EE69909D2AB1B4843C4C5B21A45`
+  or F-Droid's
+  `24A3D4756C62DD69C86DF69AA7FA327B2A6BF55F55C4A1749F99BD1DA75906BB`;
   otherwise AnkiDroid counts as not installed. A debuggable companion
   also accepts a self-built AnkiDroid. AnkiQuest's key is not known
   here: choosing AnkiQuest pins its package and SHA-256 signing
