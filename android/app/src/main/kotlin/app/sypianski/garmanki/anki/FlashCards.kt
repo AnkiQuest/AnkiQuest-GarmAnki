@@ -9,15 +9,16 @@ import android.net.Uri
  * (2026-07-22).
  */
 object FlashCards {
-    const val AUTHORITY = "com.ichi2.anki.flashcards"
-    const val READ_WRITE_PERMISSION = "com.ichi2.anki.permission.READ_WRITE_DATABASE"
-    const val ANKIDROID_PACKAGE = "com.ichi2.anki"
+    /** Same action in AnkiDroid and AnkiQuest; sent to the chosen app's package. */
     const val SYNC_ACTION = "com.ichi2.anki.DO_SYNC"
 
-    val AUTHORITY_URI: Uri = Uri.parse("content://$AUTHORITY")
-    val DECKS_URI: Uri = Uri.withAppendedPath(AUTHORITY_URI, "decks")
-    val SCHEDULE_URI: Uri = Uri.withAppendedPath(AUTHORITY_URI, "schedule")
-    val NOTES_URI: Uri = Uri.withAppendedPath(AUTHORITY_URI, "notes")
+    /** Authority, package and permission vary per app: see [FlashcardApp]. */
+    fun decksUri(app: FlashcardApp): Uri = uri(app, "decks")
+    fun scheduleUri(app: FlashcardApp): Uri = uri(app, "schedule")
+    fun notesUri(app: FlashcardApp): Uri = uri(app, "notes")
+
+    private fun uri(app: FlashcardApp, path: String): Uri =
+        Uri.withAppendedPath(Uri.parse("content://${app.authority}"), path)
 
     object Deck {
         const val DECK_NAME = "deck_name"

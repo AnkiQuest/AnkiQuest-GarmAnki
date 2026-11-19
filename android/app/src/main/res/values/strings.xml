@@ -12,8 +12,10 @@
 
     <string name="anki_section">AnkiDroid</string>
     <string name="anki_missing">AnkiDroid is not installed</string>
-    <string name="anki_no_permission">Access to the AnkiDroid database is required</string>
+    <string name="anki_no_permission">Access to the %1$s database is required</string>
     <string name="anki_grant">Grant access</string>
+    <string name="flashcard_app">Flashcard app</string>
+    <string name="flashcard_app_choose">Choose the flashcard app to read cards from. Android will ask you to allow access.</string>
 
     <string name="decks_section">Decks to sync</string>
     <string name="decks_none">No decks found</string>
@@ -34,8 +36,8 @@
     <string name="stats_today">Today: %1$d</string>
     <string name="stats_streak">Streak: %1$d days</string>
 
-    <string name="custom_study_hint">Out of cards? Increase today\'s limits with Custom study in AnkiDroid.</string>
-    <string name="open_ankidroid">Open AnkiDroid</string>
+    <string name="custom_study_hint">Out of cards? Increase today\'s limits with Custom study in %1$s.</string>
+    <string name="open_ankidroid">Open %1$s</string>
 
     <string name="answers_applied">Applied %1$d answers from the watch (%2$d stale)</string>
 

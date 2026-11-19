@@ -138,14 +138,23 @@ If `front` ends up empty → skip the card and count it as `skipped`
 - AnkiDroid via `FlashCardsContract` (permission
   `com.ichi2.anki.permission.READ_WRITE_DATABASE`): decks + due queue
   (`schedule` with `deckID`/`limit` selection) + per-card Q/A render.
+- Flashcard app (PC-004): closed list in `anki/FlashcardApp.kt` —
+  AnkiDroid (default, used without asking) and AnkiQuest
+  (`dev.hilll.anki`, authority `dev.hilll.anki.flashcards`, permission
+  `dev.hilll.anki.permission.READ_WRITE_DATABASE`, opt-in). The chosen
+  app is pinned to its package and SHA-256 signing certificate; before
+  every call the companion checks the certificate and that the authority
+  belongs to that package. A changed certificate or squatted authority
+  drops the choice and asks again; an uninstalled choice falls back to
+  AnkiDroid.
 - Replay: ease 1–4 → `EASE_1..EASE_4` with `TIME_TAKEN`; a card that
   fails to apply counts as `stale` (best effort, no retry).
 - Actions: `susp` → `SUSPEND=1`; `bury` → `BURY=1`;
   `flag` → append note tag `garmanki-flag`;
   `del` → `SUSPEND=1` + append tag `garmanki-delete` (soft delete —
   the user hard-deletes in Anki by tag filter; D4).
-- After replay: broadcast `com.ichi2.anki.DO_SYNC` (AnkiDroid rate-limits
-  to 1/5 min).
+- After replay: broadcast `com.ichi2.anki.DO_SYNC` to the chosen app
+  (AnkiDroid rate-limits to 1/5 min).
 - Stats: companion keeps a local log of applied answers; `doneToday` =
   answers applied today (watch-originated only), `streak` = consecutive
   days with ≥1 applied answer. AnkiDroid's revlog is not exposed via the
