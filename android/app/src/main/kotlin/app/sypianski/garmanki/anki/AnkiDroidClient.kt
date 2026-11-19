@@ -51,7 +51,7 @@ class AnkiDroidClient(private val context: Context) : AnkiBridge {
 
     /** Whether the provider is genuine AnkiDroid; checked again before every call. */
     fun trust(): ProviderTrust =
-        check.check(FlashCards.ANKIDROID_PACKAGE, FlashCards.AUTHORITY, setOf(ANKIDROID_RELEASE_KEY))
+        check.check(FlashCards.ANKIDROID_PACKAGE, FlashCards.AUTHORITY, ANKIDROID_KEYS)
 
     private fun trusted(): Boolean = trust() == ProviderTrust.TRUSTED
 

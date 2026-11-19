@@ -143,7 +143,9 @@ If `front` ends up empty → skip the card and count it as `skipped`
   `com.ichi2.anki` and that one of its signing certificates (rotation
   history included) has AnkiDroid's release SHA-256 (Google Play,
   GitHub)
-  `2071534F0F4B5E54AE952DD275D70DA6E3459EE69909D2AB1B4843C4C5B21A45`.
+  `2071534F0F4B5E54AE952DD275D70DA6E3459EE69909D2AB1B4843C4C5B21A45`
+  or F-Droid's
+  `24A3D4756C62DD69C86DF69AA7FA327B2A6BF55F55C4A1749F99BD1DA75906BB`.
   Otherwise AnkiDroid counts as not installed. A debuggable companion
   also accepts a self-built AnkiDroid.
 - Replay: ease 1–4 → `EASE_1..EASE_4` with `TIME_TAKEN`; a card that

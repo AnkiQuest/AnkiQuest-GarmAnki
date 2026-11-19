@@ -7,6 +7,16 @@ package app.sypianski.garmanki.anki
  */
 const val ANKIDROID_RELEASE_KEY = "2071534F0F4B5E54AE952DD275D70DA6E3459EE69909D2AB1B4843C4C5B21A45"
 
+/**
+ * SHA-256 of the certificate F-Droid signs its AnkiDroid builds with
+ * (read from com.ichi2.anki_225033004.apk on f-droid.org). F-Droid builds
+ * AnkiDroid itself and signs it with its own per-app key.
+ */
+const val ANKIDROID_FDROID_KEY = "24A3D4756C62DD69C86DF69AA7FA327B2A6BF55F55C4A1749F99BD1DA75906BB"
+
+/** Every key a released AnkiDroid is signed with. */
+val ANKIDROID_KEYS = setOf(ANKIDROID_RELEASE_KEY, ANKIDROID_FDROID_KEY)
+
 /** Platform seam: what PackageManager says about installed apps. */
 interface InstalledApps {
     /** SHA-256 hex digests of the package's signing certificates; empty if not installed. */

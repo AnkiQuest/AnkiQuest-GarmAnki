@@ -1,5 +1,7 @@
 package app.sypianski.garmanki
 
+import app.sypianski.garmanki.anki.ANKIDROID_FDROID_KEY
+import app.sypianski.garmanki.anki.ANKIDROID_KEYS
 import app.sypianski.garmanki.anki.ANKIDROID_RELEASE_KEY
 import app.sypianski.garmanki.anki.CompanionBuild
 import app.sypianski.garmanki.anki.InstalledApps
@@ -20,7 +22,7 @@ class ProviderCheckTest {
     }
 
     private val installed = FakeInstalled()
-    private val keys = setOf(ANKIDROID_RELEASE_KEY)
+    private val keys = ANKIDROID_KEYS
 
     private fun installAnkiDroid(vararg digests: String) {
         installed.signers[PACKAGE] = digests.toSet()
@@ -34,6 +36,13 @@ class ProviderCheckTest {
     fun `genuine AnkiDroid is trusted`() {
         // PackageManager digests are lower-case hex.
         installAnkiDroid(ANKIDROID_RELEASE_KEY.lowercase())
+
+        assertEquals(ProviderTrust.TRUSTED, check())
+    }
+
+    @Test
+    fun `AnkiDroid from F-Droid is trusted`() {
+        installAnkiDroid(ANKIDROID_FDROID_KEY.lowercase())
 
         assertEquals(ProviderTrust.TRUSTED, check())
     }
