@@ -47,15 +47,29 @@ class AnkiDroidClient(private val context: Context) : AnkiBridge {
 
     private val resolver get() = context.contentResolver
     private val json = Json { ignoreUnknownKeys = true }
+    private val check = ProviderCheck(AndroidInstalledApps(context), companionBuild(context))
 
-    override fun available(): Boolean =
-        context.packageManager.resolveContentProvider(FlashCards.AUTHORITY, 0) != null
+    /** Whether the provider is genuine AnkiDroid; checked again before every call. */
+    fun trust(): ProviderTrust =
+        check.check(FlashCards.ANKIDROID_PACKAGE, FlashCards.AUTHORITY, setOf(ANKIDROID_RELEASE_KEY))
 
-    override fun hasPermission(): Boolean =
-        context.checkSelfPermission(FlashCards.READ_WRITE_PERMISSION) ==
+    private fun trusted(): Boolean = trust() == ProviderTrust.TRUSTED
+
+    /** False also when another app holds the authority or the key is unknown. */
+    override fun available(): Boolean = trusted()
+
+    override fun hasPermission(): Boolean {
+        if (!trusted()) {
+            return false
+        }
+        return context.checkSelfPermission(FlashCards.READ_WRITE_PERMISSION) ==
             PackageManager.PERMISSION_GRANTED
+    }
 
     override fun listDecks(): List<AnkiDeck> {
+        if (!trusted()) {
+            return emptyList()
+        }
         val out = mutableListOf<AnkiDeck>()
         resolver.query(FlashCards.DECKS_URI, null, null, null, null)?.use { c ->
             val iId = c.getColumnIndex(FlashCards.Deck.DECK_ID)
@@ -81,6 +95,9 @@ class AnkiDroidClient(private val context: Context) : AnkiBridge {
     }
 
     override fun dueCards(deckId: Long, limit: Int): List<DueCard> {
+        if (!trusted()) {
+            return emptyList()
+        }
         val out = mutableListOf<DueCard>()
         // Selection string format is parsed by AnkiDroid itself — documented
         // example: selector "limit=?, deckID=?", args ["5", "123456789"].
@@ -110,6 +127,9 @@ class AnkiDroidClient(private val context: Context) : AnkiBridge {
     }
 
     override fun cardQA(noteId: Long, ord: Int): CardQA? {
+        if (!trusted()) {
+            return null
+        }
         val uri = FlashCards.NOTES_URI.buildUpon()
             .appendPath(noteId.toString())
             .appendPath("cards")
@@ -131,6 +151,9 @@ class AnkiDroidClient(private val context: Context) : AnkiBridge {
     }
 
     override fun answerCard(noteId: Long, ord: Int, ease: Int, timeTakenMs: Long): Boolean {
+        if (!trusted()) {
+            return false
+        }
         val values = ContentValues().apply {
             put(FlashCards.ReviewInfo.NOTE_ID, noteId)
             put(FlashCards.ReviewInfo.CARD_ORD, ord)
@@ -147,6 +170,9 @@ class AnkiDroidClient(private val context: Context) : AnkiBridge {
         setScheduleFlag(noteId, ord, FlashCards.ReviewInfo.BURY)
 
     private fun setScheduleFlag(noteId: Long, ord: Int, column: String): Boolean {
+        if (!trusted()) {
+            return false
+        }
         val values = ContentValues().apply {
             put(FlashCards.ReviewInfo.NOTE_ID, noteId)
             put(FlashCards.ReviewInfo.CARD_ORD, ord)
@@ -156,6 +182,9 @@ class AnkiDroidClient(private val context: Context) : AnkiBridge {
     }
 
     override fun addTag(noteId: Long, tag: String): Boolean {
+        if (!trusted()) {
+            return false
+        }
         val noteUri = Uri.withAppendedPath(FlashCards.NOTES_URI, noteId.toString())
         var tags = ""
         resolver.query(noteUri, arrayOf(FlashCards.Note.TAGS), null, null, null)?.use { c ->
@@ -176,6 +205,9 @@ class AnkiDroidClient(private val context: Context) : AnkiBridge {
     }
 
     override fun requestSync() {
+        if (!trusted()) {
+            return
+        }
         // AnkiDroid rate-limits this to once per 5 minutes on its side too.
         context.sendBroadcast(Intent(FlashCards.SYNC_ACTION))
         context.sendBroadcast(Intent(FlashCards.SYNC_ACTION).setPackage(FlashCards.ANKIDROID_PACKAGE))

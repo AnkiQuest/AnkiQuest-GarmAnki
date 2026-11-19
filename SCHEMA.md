@@ -138,6 +138,14 @@ If `front` ends up empty → skip the card and count it as `skipped`
 - AnkiDroid via `FlashCardsContract` (permission
   `com.ichi2.anki.permission.READ_WRITE_DATABASE`): decks + due queue
   (`schedule` with `deckID`/`limit` selection) + per-card Q/A render.
+- Provider check (`anki/ProviderCheck.kt`): before every call the
+  companion checks that `com.ichi2.anki.flashcards` is held by
+  `com.ichi2.anki` and that one of its signing certificates (rotation
+  history included) has AnkiDroid's release SHA-256 (Google Play,
+  GitHub)
+  `2071534F0F4B5E54AE952DD275D70DA6E3459EE69909D2AB1B4843C4C5B21A45`.
+  Otherwise AnkiDroid counts as not installed. A debuggable companion
+  also accepts a self-built AnkiDroid.
 - Replay: ease 1–4 → `EASE_1..EASE_4` with `TIME_TAKEN`; a card that
   fails to apply counts as `stale` (best effort, no retry).
 - Actions: `susp` → `SUSPEND=1`; `bury` → `BURY=1`;

@@ -63,6 +63,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import app.sypianski.garmanki.anki.FlashCards
+import app.sypianski.garmanki.anki.ProviderTrust
 import app.sypianski.garmanki.ciq.CiqState
 import app.sypianski.garmanki.ciq.PushStatus
 import app.sypianski.garmanki.ciq.WatchDevice
@@ -102,7 +103,8 @@ private fun HomeScreen(app: App, navController: NavHostController) {
     val settings by app.settings.flow.collectAsState(initial = null)
 
     var refreshTick by remember { mutableIntStateOf(0) }
-    val ankiAvailable = remember(refreshTick) { app.anki.available() }
+    val ankiTrust = remember(refreshTick) { app.anki.trust() }
+    val ankiAvailable = ankiTrust == ProviderTrust.TRUSTED
     val ankiPermitted = remember(refreshTick) { ankiAvailable && app.anki.hasPermission() }
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -123,7 +125,7 @@ private fun HomeScreen(app: App, navController: NavHostController) {
         ) {
             item { Masthead() }
             item { WatchCard(ciqState, devices) }
-            item { AnkiCard(ankiAvailable, ankiPermitted, settings, permissionLauncher) }
+            item { AnkiCard(ankiTrust, ankiPermitted, settings, permissionLauncher) }
 
             if (ankiPermitted) {
                 item {
@@ -464,15 +466,21 @@ private fun WatchCard(state: CiqState, devices: List<WatchDevice>) {
 
 @Composable
 private fun AnkiCard(
-    ankiAvailable: Boolean,
+    ankiTrust: ProviderTrust,
     ankiPermitted: Boolean,
     settings: Settings?,
     permissionLauncher: ActivityResultLauncher<String>,
 ) {
     SectionCard(stringResource(R.string.anki_section)) {
         when {
-            !ankiAvailable -> Text(
+            // Not installed, or not genuine AnkiDroid: same card, clearer text.
+            ankiTrust == ProviderTrust.NOT_INSTALLED -> Text(
                 stringResource(R.string.anki_missing),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error,
+            )
+            ankiTrust != ProviderTrust.TRUSTED -> Text(
+                stringResource(R.string.anki_untrusted),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.error,
             )
