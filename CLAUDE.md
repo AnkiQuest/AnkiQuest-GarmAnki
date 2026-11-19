@@ -26,7 +26,14 @@ cd watch && monkeyc -f monkey.jungle -d fr965 -o bin/garmanki.prg -y developer_k
 
 # android
 cd android && ./gradlew assembleRelease lint testDebugUnitTest
+
+# android via Nix (JDK 17 + Android SDK from flake.nix; format with alejandra)
+nix develop -c sh -c 'cd android && ./gradlew assembleDebug'
+nix fmt
 ```
+
+CI (`.github/workflows/ankiquest-ci.yml`, AnkiQuest fork only): Gradle build,
+lint and unit tests, plus `nix flake check` and a build in the Nix shell.
 
 ## Connect IQ Store
 
