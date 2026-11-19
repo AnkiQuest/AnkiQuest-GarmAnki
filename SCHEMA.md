@@ -147,6 +147,14 @@ If `front` ends up empty → skip the card and count it as `skipped`
   and that the authority belongs to that package. A changed certificate
   or squatted authority drops the choice and asks again; an uninstalled
   choice falls back to AnkiDroid.
+- Provider check (`anki/ProviderCheck.kt`): before every call the
+  companion checks that `com.ichi2.anki.flashcards` is held by
+  `com.ichi2.anki` and that one of its signing certificates (rotation
+  history included) has AnkiDroid's release SHA-256 (Google Play,
+  GitHub)
+  `2071534F0F4B5E54AE952DD275D70DA6E3459EE69909D2AB1B4843C4C5B21A45`.
+  Otherwise AnkiDroid counts as not installed. A debuggable companion
+  also accepts a self-built AnkiDroid.
 - Replay: ease 1–4 → `EASE_1..EASE_4` with `TIME_TAKEN`; a card that
   fails to apply counts as `stale` (best effort, no retry).
 - Actions: `susp` → `SUSPEND=1`; `bury` → `BURY=1`;

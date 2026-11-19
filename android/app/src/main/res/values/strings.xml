@@ -12,6 +12,7 @@
 
     <string name="anki_section">AnkiDroid</string>
     <string name="anki_missing">AnkiDroid is not installed</string>
+    <string name="anki_untrusted">AnkiDroid could not be verified: the app answering for it is not signed with AnkiDroid\'s release key (Google Play, GitHub), so garmanki does not use it.</string>
     <string name="anki_no_permission">Access to the %1$s database is required</string>
     <string name="anki_grant">Grant access</string>
     <string name="flashcard_app">Flashcard app</string>

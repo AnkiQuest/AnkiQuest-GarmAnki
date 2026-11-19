@@ -52,7 +52,7 @@ class AnkiDroidClient(private val context: Context) : AnkiBridge {
     private val resolver get() = context.contentResolver
     private val json = Json { ignoreUnknownKeys = true }
     private val installed = AndroidInstalledApps(context)
-    private val apps = FlashcardAppResolver(installed, PrefsPinStore(context))
+    private val apps = FlashcardAppResolver(installed, PrefsPinStore(context), companionBuild(context))
 
     /** Which flashcard app is in use, or why none is. */
     fun appState(): FlashcardAppState = apps.resolve()

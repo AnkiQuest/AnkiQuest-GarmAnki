@@ -28,15 +28,6 @@ enum class FlashcardApp(
     }
 }
 
-/** Platform seam: what PackageManager says about installed apps. */
-interface InstalledApps {
-    /** SHA-256 hex digests of the package's signing certificates; empty if not installed. */
-    fun signerDigests(packageName: String): Set<String>
-
-    /** Package that currently holds the provider authority, or null. */
-    fun authorityHolder(authority: String): String?
-}
-
 /** What the user (or trust on first use) last chose. */
 sealed interface StoredChoice {
     /** Nothing chosen yet: the default is used if installed. */
@@ -57,6 +48,10 @@ interface PinStore {
 
 sealed interface FlashcardAppState {
     data object NoneInstalled : FlashcardAppState
+
+    /** Nothing usable, and AnkiDroid's authority answered but failed [ProviderCheck]. */
+    data object Unverified : FlashcardAppState
+
     data class NeedsChoice(val candidates: List<FlashcardApp>) : FlashcardAppState
     data class Ready(val app: FlashcardApp, val candidates: List<FlashcardApp>) : FlashcardAppState
 }
@@ -73,12 +68,15 @@ sealed interface FlashcardAppState {
  *   AnkiDroid usable? ──yes──> pin it (first use), Ready(AnkiDroid)
  *        │ no
  *        v
- *   NeedsChoice, or NoneInstalled
+ *   NeedsChoice, Unverified or NoneInstalled
  */
 class FlashcardAppResolver(
     private val installed: InstalledApps,
     private val pins: PinStore,
+    build: CompanionBuild,
 ) {
+
+    private val check = ProviderCheck(installed, build)
 
     fun resolve(): FlashcardAppState {
         val candidates = candidates()
@@ -90,7 +88,7 @@ class FlashcardAppResolver(
         }
 
         if (candidates.isEmpty()) {
-            return FlashcardAppState.NoneInstalled
+            return noneUsable()
         }
 
         // A broken pin asks again instead of switching silently.
@@ -117,10 +115,22 @@ class FlashcardAppResolver(
         return pin(app)
     }
 
-    /** Installed apps whose authority is held by the expected package. */
-    private fun candidates(): List<FlashcardApp> = FlashcardApp.entries.filter { app ->
-        installed.signerDigests(app.packageName).isNotEmpty() &&
-            installed.authorityHolder(app.authority) == app.packageName
+    /** Installed apps that pass [ProviderCheck]. */
+    private fun candidates(): List<FlashcardApp> =
+        FlashcardApp.entries.filter { trust(it) == ProviderTrust.TRUSTED }
+
+    /** AnkiDroid needs its release key; AnkiQuest's key is pinned on choice. */
+    private fun trust(app: FlashcardApp): ProviderTrust = when (app) {
+        FlashcardApp.ANKIDROID -> check.check(app.packageName, app.authority, setOf(ANKIDROID_RELEASE_KEY))
+        FlashcardApp.ANKIQUEST -> check.holder(app.packageName, app.authority)
+    }
+
+    /** Says "could not be verified" rather than "not installed" when AnkiDroid's authority answered. */
+    private fun noneUsable(): FlashcardAppState {
+        if (trust(FlashcardApp.DEFAULT) == ProviderTrust.NOT_INSTALLED) {
+            return FlashcardAppState.NoneInstalled
+        }
+        return FlashcardAppState.Unverified
     }
 
     /** Validates the stored choice; persists the downgrade when it no longer holds. */
@@ -129,10 +139,8 @@ class FlashcardAppResolver(
             return choice
         }
 
-        val digests = installed.signerDigests(choice.app.packageName)
-
         // Uninstalled: forget it, the default takes over.
-        if (digests.isEmpty()) {
+        if (installed.signerDigests(choice.app.packageName).isEmpty()) {
             pins.save(StoredChoice.None)
             return StoredChoice.None
         }
@@ -140,7 +148,7 @@ class FlashcardAppResolver(
         // Different certificate or package, or authority squatted: ask again.
         val valid = choice.app in candidates &&
             choice.packageName == choice.app.packageName &&
-            choice.digest in digests
+            check.pinned(choice.packageName, choice.app.authority, choice.digest) == ProviderTrust.TRUSTED
         if (!valid) {
             pins.save(StoredChoice.Revoked)
             return StoredChoice.Revoked

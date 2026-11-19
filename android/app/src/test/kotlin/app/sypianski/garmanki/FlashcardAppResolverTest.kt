@@ -1,5 +1,7 @@
 package app.sypianski.garmanki
 
+import app.sypianski.garmanki.anki.ANKIDROID_RELEASE_KEY
+import app.sypianski.garmanki.anki.CompanionBuild
 import app.sypianski.garmanki.anki.FlashcardApp
 import app.sypianski.garmanki.anki.FlashcardAppResolver
 import app.sypianski.garmanki.anki.FlashcardAppState
@@ -45,7 +47,7 @@ class FlashcardAppResolverTest {
 
     private val installed = FakeInstalled()
     private val pins = FakePins()
-    private val resolver = FlashcardAppResolver(installed, pins)
+    private val resolver = FlashcardAppResolver(installed, pins, CompanionBuild.RELEASE)
 
     @Test
     fun `none installed`() {
@@ -55,10 +57,10 @@ class FlashcardAppResolverTest {
 
     @Test
     fun `AnkiDroid only is used without asking and pinned`() {
-        installed.install(ankiDroid, "ad")
+        installed.install(ankiDroid, ANKIDROID_RELEASE_KEY)
 
         assertEquals(FlashcardAppState.Ready(ankiDroid, listOf(ankiDroid)), resolver.resolve())
-        assertEquals(StoredChoice.Pinned(ankiDroid, ankiDroid.packageName, "ad"), pins.choice)
+        assertEquals(StoredChoice.Pinned(ankiDroid, ankiDroid.packageName, ANKIDROID_RELEASE_KEY), pins.choice)
     }
 
     @Test
@@ -74,7 +76,7 @@ class FlashcardAppResolverTest {
 
     @Test
     fun `both installed defaults to AnkiDroid until AnkiQuest is chosen`() {
-        installed.install(ankiDroid, "ad")
+        installed.install(ankiDroid, ANKIDROID_RELEASE_KEY)
         installed.install(ankiQuest, "aq")
         val both = listOf(ankiDroid, ankiQuest)
 
@@ -86,7 +88,7 @@ class FlashcardAppResolverTest {
 
     @Test
     fun `chosen app uninstalled falls back to the default`() {
-        installed.install(ankiDroid, "ad")
+        installed.install(ankiDroid, ANKIDROID_RELEASE_KEY)
         installed.install(ankiQuest, "aq")
         resolver.choose(ankiQuest)
 
@@ -97,7 +99,7 @@ class FlashcardAppResolverTest {
 
     @Test
     fun `changed certificate resets the choice and asks again`() {
-        installed.install(ankiDroid, "ad")
+        installed.install(ankiDroid, ANKIDROID_RELEASE_KEY)
         installed.install(ankiQuest, "aq")
         resolver.choose(ankiQuest)
 
@@ -112,26 +114,26 @@ class FlashcardAppResolverTest {
 
     @Test
     fun `changed AnkiDroid certificate asks again`() {
-        installed.install(ankiDroid, "ad")
+        installed.install(ankiDroid, ANKIDROID_RELEASE_KEY)
         resolver.resolve()
 
         installed.install(ankiDroid, "evil")
 
-        assertEquals(FlashcardAppState.NeedsChoice(listOf(ankiDroid)), resolver.resolve())
+        assertEquals(FlashcardAppState.Unverified, resolver.resolve())
     }
 
     @Test
     fun `authority held by an unexpected package is rejected`() {
-        installed.signers[ankiDroid.packageName] = setOf("ad")
+        installed.signers[ankiDroid.packageName] = setOf(ANKIDROID_RELEASE_KEY)
         installed.authorities[ankiDroid.authority] = "com.example.squatter"
 
-        assertEquals(FlashcardAppState.NoneInstalled, resolver.resolve())
+        assertEquals(FlashcardAppState.Unverified, resolver.resolve())
         assertFalse(resolver.choose(ankiDroid))
     }
 
     @Test
     fun `squatted authority revokes an existing pin`() {
-        installed.install(ankiDroid, "ad")
+        installed.install(ankiDroid, ANKIDROID_RELEASE_KEY)
         installed.install(ankiQuest, "aq")
         resolver.choose(ankiQuest)
 

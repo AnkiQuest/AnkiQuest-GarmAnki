@@ -488,7 +488,7 @@ private class AppOption(val app: FlashcardApp, val label: String, val icon: Imag
 
 private fun appOptions(app: App, state: FlashcardAppState): List<AppOption> {
     val candidates = when (state) {
-        FlashcardAppState.NoneInstalled -> emptyList()
+        FlashcardAppState.NoneInstalled, FlashcardAppState.Unverified -> emptyList()
         is FlashcardAppState.NeedsChoice -> state.candidates
         is FlashcardAppState.Ready -> state.candidates
     }
@@ -510,6 +510,12 @@ private fun AnkiCard(
         when {
             appState is FlashcardAppState.NoneInstalled -> Text(
                 stringResource(R.string.anki_missing),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error,
+            )
+            // AnkiDroid's authority answered, but not with AnkiDroid's release key.
+            appState is FlashcardAppState.Unverified -> Text(
+                stringResource(R.string.anki_untrusted),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.error,
             )
