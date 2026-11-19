@@ -3,15 +3,15 @@
 
     <!-- Talk to the AnkiDroid or AnkiQuest ContentProvider (SCHEMA.md §7, anki/FlashcardApp.kt). -->
     <uses-permission android:name="com.ichi2.anki.permission.READ_WRITE_DATABASE" />
-    <uses-permission android:name="dev.hilll.anki.permission.READ_WRITE_DATABASE" />
+    <uses-permission android:name="org.ankiquest.anki.permission.READ_WRITE_DATABASE" />
 
     <!-- Android 11+ package visibility: AnkiDroid, AnkiQuest + Garmin Connect Mobile. -->
     <queries>
         <package android:name="com.ichi2.anki" />
-        <package android:name="dev.hilll.anki" />
+        <package android:name="org.ankiquest.anki" />
         <package android:name="com.garmin.android.apps.connectmobile" />
         <provider android:authorities="com.ichi2.anki.flashcards" />
-        <provider android:authorities="dev.hilll.anki.flashcards" />
+        <provider android:authorities="org.ankiquest.anki.flashcards" />
     </queries>
 
     <application

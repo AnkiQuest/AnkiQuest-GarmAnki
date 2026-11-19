@@ -140,13 +140,13 @@ If `front` ends up empty → skip the card and count it as `skipped`
   (`schedule` with `deckID`/`limit` selection) + per-card Q/A render.
 - Flashcard app (PC-004): closed list in `anki/FlashcardApp.kt` —
   AnkiDroid (default, used without asking) and AnkiQuest
-  (`dev.hilll.anki`, authority `dev.hilll.anki.flashcards`, permission
-  `dev.hilll.anki.permission.READ_WRITE_DATABASE`, opt-in). The chosen
-  app is pinned to its package and SHA-256 signing certificate; before
-  every call the companion checks the certificate and that the authority
-  belongs to that package. A changed certificate or squatted authority
-  drops the choice and asks again; an uninstalled choice falls back to
-  AnkiDroid.
+  (`org.ankiquest.anki`, authority `org.ankiquest.anki.flashcards`,
+  permission `org.ankiquest.anki.permission.READ_WRITE_DATABASE`,
+  opt-in). The chosen app is pinned to its package and SHA-256 signing
+  certificate; before every call the companion checks the certificate
+  and that the authority belongs to that package. A changed certificate
+  or squatted authority drops the choice and asks again; an uninstalled
+  choice falls back to AnkiDroid.
 - Replay: ease 1–4 → `EASE_1..EASE_4` with `TIME_TAKEN`; a card that
   fails to apply counts as `stale` (best effort, no retry).
 - Actions: `susp` → `SUSPEND=1`; `bury` → `BURY=1`;

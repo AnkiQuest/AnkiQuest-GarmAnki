@@ -16,9 +16,9 @@ enum class FlashcardApp(
         "com.ichi2.anki.permission.READ_WRITE_DATABASE",
     ),
     ANKIQUEST(
-        "dev.hilll.anki",
-        "dev.hilll.anki.flashcards",
-        "dev.hilll.anki.permission.READ_WRITE_DATABASE",
+        "org.ankiquest.anki",
+        "org.ankiquest.anki.flashcards",
+        "org.ankiquest.anki.permission.READ_WRITE_DATABASE",
     ),
     ;
 

@@ -16,7 +16,7 @@ osiadlo: "android/…/anki/FlashcardApp.kt, AndroidFlashcardApps.kt, AnkiDroidCl
 ---
 # PC-004 · AnkiQuest jako druga aplikacja z fiszkami obok AnkiDroid
 
-**Kontekst.** [AnkiQuest](https://github.com/AnkiQuest/AnkiQuest-Android) to fork AnkiDroid z tym samym ContentProviderem (`FlashCardsContract`), ale z pakietem `dev.hilll.anki`, authority `dev.hilll.anki.flashcards` i uprawnieniem `dev.hilll.anki.permission.READ_WRITE_DATABASE`. Companion miał na sztywno `com.ichi2.anki`. Maintainer AnkiDroid sprzeciwił się otwartemu wykrywaniu providerów: „other apps expect only communicating to AnkiDroid because they trust us”.
+**Kontekst.** [AnkiQuest](https://github.com/AnkiQuest/AnkiQuest-Android) to fork AnkiDroid z tym samym ContentProviderem (`FlashCardsContract`), ale z pakietem `org.ankiquest.anki`, authority `org.ankiquest.anki.flashcards` i uprawnieniem `org.ankiquest.anki.permission.READ_WRITE_DATABASE`. Companion miał na sztywno `com.ichi2.anki`. Maintainer AnkiDroid sprzeciwił się otwartemu wykrywaniu providerów: „other apps expect only communicating to AnkiDroid because they trust us”.
 
 **Decyzja.** Companion zna zamkniętą listę dwóch aplikacji z FlashCardsContract: AnkiDroid (domyślna, bez pytania) i AnkiQuest (tylko po wyborze użytkownika). Wybór jest przypięty do pakietu i SHA-256 certyfikatu podpisu.
 
