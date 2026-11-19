@@ -56,11 +56,12 @@ class FlashcardAppResolverTest {
     }
 
     @Test
-    fun `AnkiDroid only is used without asking and pinned`() {
-        installed.install(ankiDroid, ANKIDROID_RELEASE_KEY)
+    fun `AnkiDroid with its release key is used without asking or pinning`() {
+        // PackageManager digests are lower-case hex.
+        installed.install(ankiDroid, ANKIDROID_RELEASE_KEY.lowercase())
 
         assertEquals(FlashcardAppState.Ready(ankiDroid, listOf(ankiDroid)), resolver.resolve())
-        assertEquals(StoredChoice.Pinned(ankiDroid, ankiDroid.packageName, ANKIDROID_RELEASE_KEY), pins.choice)
+        assertEquals(StoredChoice.None, pins.choice)
     }
 
     @Test
@@ -113,13 +114,34 @@ class FlashcardAppResolverTest {
     }
 
     @Test
-    fun `changed AnkiDroid certificate asks again`() {
+    fun `AnkiDroid with an unknown key is not used`() {
         installed.install(ankiDroid, ANKIDROID_RELEASE_KEY)
         resolver.resolve()
 
         installed.install(ankiDroid, "evil")
 
         assertEquals(FlashcardAppState.Unverified, resolver.resolve())
+        assertFalse(resolver.choose(ankiDroid))
+    }
+
+    @Test
+    fun `debuggable companion uses a self-built AnkiDroid`() {
+        installed.install(ankiDroid, "self-built")
+        val debug = FlashcardAppResolver(installed, pins, CompanionBuild.DEBUGGABLE)
+
+        assertEquals(FlashcardAppState.Ready(ankiDroid, listOf(ankiDroid)), debug.resolve())
+    }
+
+    @Test
+    fun `choosing AnkiDroid again drops the AnkiQuest pin`() {
+        installed.install(ankiDroid, ANKIDROID_RELEASE_KEY)
+        installed.install(ankiQuest, "aq")
+        resolver.choose(ankiQuest)
+
+        assertTrue(resolver.choose(ankiDroid))
+
+        assertEquals(StoredChoice.None, pins.choice)
+        assertEquals(FlashcardAppState.Ready(ankiDroid, listOf(ankiDroid, ankiQuest)), resolver.resolve())
     }
 
     @Test

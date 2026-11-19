@@ -142,19 +142,19 @@ If `front` ends up empty → skip the card and count it as `skipped`
   AnkiDroid (default, used without asking) and AnkiQuest
   (`org.ankiquest.anki`, authority `org.ankiquest.anki.flashcards`,
   permission `org.ankiquest.anki.permission.READ_WRITE_DATABASE`,
-  opt-in). The chosen app is pinned to its package and SHA-256 signing
-  certificate; before every call the companion checks the certificate
-  and that the authority belongs to that package. A changed certificate
-  or squatted authority drops the choice and asks again; an uninstalled
-  choice falls back to AnkiDroid.
-- Provider check (`anki/ProviderCheck.kt`): before every call the
-  companion checks that `com.ichi2.anki.flashcards` is held by
-  `com.ichi2.anki` and that one of its signing certificates (rotation
-  history included) has AnkiDroid's release SHA-256 (Google Play,
+  opt-in).
+- Provider check (`anki/ProviderCheck.kt`), before every call: the
+  authority must be held by the app's package, and one of its signing
+  certificates (rotation history included) must match its key.
+  AnkiDroid's key is built in: the release SHA-256 (Google Play,
   GitHub)
-  `2071534F0F4B5E54AE952DD275D70DA6E3459EE69909D2AB1B4843C4C5B21A45`.
-  Otherwise AnkiDroid counts as not installed. A debuggable companion
-  also accepts a self-built AnkiDroid.
+  `2071534F0F4B5E54AE952DD275D70DA6E3459EE69909D2AB1B4843C4C5B21A45`;
+  otherwise AnkiDroid counts as not installed. A debuggable companion
+  also accepts a self-built AnkiDroid. AnkiQuest's key is not known
+  here: choosing AnkiQuest pins its package and SHA-256 signing
+  certificate. A changed AnkiQuest certificate or squatted authority
+  drops the choice and asks again; an uninstalled choice falls back to
+  AnkiDroid.
 - Replay: ease 1–4 → `EASE_1..EASE_4` with `TIME_TAKEN`; a card that
   fails to apply counts as `stale` (best effort, no retry).
 - Actions: `susp` → `SUSPEND=1`; `bury` → `BURY=1`;

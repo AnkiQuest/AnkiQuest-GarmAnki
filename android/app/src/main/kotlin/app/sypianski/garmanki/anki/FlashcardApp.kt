@@ -9,31 +9,43 @@ enum class FlashcardApp(
     val packageName: String,
     val authority: String,
     val permission: String,
+    val key: SigningKey,
 ) {
     ANKIDROID(
         "com.ichi2.anki",
         "com.ichi2.anki.flashcards",
         "com.ichi2.anki.permission.READ_WRITE_DATABASE",
+        SigningKey.BuiltIn(ANKIDROID_RELEASE_KEY),
     ),
     ANKIQUEST(
         "org.ankiquest.anki",
         "org.ankiquest.anki.flashcards",
         "org.ankiquest.anki.permission.READ_WRITE_DATABASE",
+        SigningKey.PinnedOnChoice,
     ),
     ;
 
     companion object {
-        /** Used without asking when installed; every other app is opt-in. */
+        /** Used without asking when it passes the release-key check; every other app is opt-in. */
         val DEFAULT = ANKIDROID
     }
 }
 
-/** What the user (or trust on first use) last chose. */
+/** How the companion knows an app's signing key. */
+sealed interface SigningKey {
+    /** Release key built into the companion. */
+    data class BuiltIn(val sha256: String) : SigningKey
+
+    /** Not known here: pinned when the user chooses the app. */
+    data object PinnedOnChoice : SigningKey
+}
+
+/** What the user last chose. */
 sealed interface StoredChoice {
     /** Nothing chosen yet: the default is used if installed. */
     data object None : StoredChoice
 
-    /** App chosen, bound to its package and signing certificate. */
+    /** [SigningKey.PinnedOnChoice] app chosen, bound to its package and signing certificate. */
     data class Pinned(val app: FlashcardApp, val packageName: String, val digest: String) : StoredChoice
 
     /** A pin stopped matching: the user must choose again. */
@@ -65,7 +77,7 @@ sealed interface FlashcardAppState {
  *   Revoked? ──yes──> NeedsChoice
  *        │ no
  *        v
- *   AnkiDroid usable? ──yes──> pin it (first use), Ready(AnkiDroid)
+ *   AnkiDroid with its release key? ──yes──> Ready(AnkiDroid)
  *        │ no
  *        v
  *   NeedsChoice, Unverified or NoneInstalled
@@ -96,21 +108,24 @@ class FlashcardAppResolver(
             return FlashcardAppState.NeedsChoice(candidates)
         }
 
-        // No choice yet: only the default is used without asking.
+        // No choice yet: only the default is used without asking; its key is built in.
         val default = FlashcardApp.DEFAULT
         if (default !in candidates) {
-            return FlashcardAppState.NeedsChoice(candidates)
-        }
-        if (!pin(default)) {
             return FlashcardAppState.NeedsChoice(candidates)
         }
         return FlashcardAppState.Ready(default, candidates)
     }
 
-    /** User picked [app] from the list; pins its current certificate. */
+    /** User picked [app] from the list; pins its current certificate unless the key is built in. */
     fun choose(app: FlashcardApp): Boolean {
         if (app !in candidates()) {
             return false
+        }
+
+        // Back to the default: no pin, the release-key check runs on every call.
+        if (app == FlashcardApp.DEFAULT) {
+            pins.save(StoredChoice.None)
+            return true
         }
         return pin(app)
     }
@@ -119,10 +134,10 @@ class FlashcardAppResolver(
     private fun candidates(): List<FlashcardApp> =
         FlashcardApp.entries.filter { trust(it) == ProviderTrust.TRUSTED }
 
-    /** AnkiDroid needs its release key; AnkiQuest's key is pinned on choice. */
-    private fun trust(app: FlashcardApp): ProviderTrust = when (app) {
-        FlashcardApp.ANKIDROID -> check.check(app.packageName, app.authority, setOf(ANKIDROID_RELEASE_KEY))
-        FlashcardApp.ANKIQUEST -> check.holder(app.packageName, app.authority)
+    /** A built-in key is checked here; a pinned key only once chosen, in [checkPin]. */
+    private fun trust(app: FlashcardApp): ProviderTrust = when (val key = app.key) {
+        is SigningKey.BuiltIn -> check.check(app.packageName, app.authority, setOf(key.sha256))
+        SigningKey.PinnedOnChoice -> check.holder(app.packageName, app.authority)
     }
 
     /** Says "could not be verified" rather than "not installed" when AnkiDroid's authority answered. */
