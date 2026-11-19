@@ -26,7 +26,8 @@ or Garmin.
 ## Requirements
 
 - An Android phone (Android 8+) with **AnkiDroid** and **Garmin Connect**
-  installed on the same phone.
+  installed on the same phone. [AnkiQuest](https://github.com/AnkiQuest/AnkiQuest-Android),
+  an AnkiDroid fork, also works once you pick it as the flashcard app.
 - A supported Garmin watch (below). Most models need Connect IQ 4.2.1+;
   the fēnix 6 Pro-class watches run API 3.4, vívoactive 4 / 4S API 3.3.
 

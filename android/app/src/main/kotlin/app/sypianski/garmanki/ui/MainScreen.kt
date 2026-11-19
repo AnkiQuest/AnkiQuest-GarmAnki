@@ -6,6 +6,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -33,6 +35,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -46,10 +49,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.drawable.toBitmap
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -62,7 +69,8 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import app.sypianski.garmanki.anki.FlashCards
+import app.sypianski.garmanki.anki.FlashcardApp
+import app.sypianski.garmanki.anki.FlashcardAppState
 import app.sypianski.garmanki.ciq.CiqState
 import app.sypianski.garmanki.ciq.PushStatus
 import app.sypianski.garmanki.ciq.WatchDevice
@@ -102,12 +110,23 @@ private fun HomeScreen(app: App, navController: NavHostController) {
     val settings by app.settings.flow.collectAsState(initial = null)
 
     var refreshTick by remember { mutableIntStateOf(0) }
-    val ankiAvailable = remember(refreshTick) { app.anki.available() }
-    val ankiPermitted = remember(refreshTick) { ankiAvailable && app.anki.hasPermission() }
+    val appState = remember(refreshTick) { app.anki.appState() }
+    val ankiApp = (appState as? FlashcardAppState.Ready)?.app
+    val ankiPermitted = remember(refreshTick) { ankiApp != null && app.anki.hasPermission() }
+    val appOptions = remember(refreshTick) { appOptions(app, appState) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { refreshTick++ }
+
+    // Picking an app pins its certificate, then Android's dialog names it.
+    val onChoose: (FlashcardApp) -> Unit = { choice ->
+        if (app.anki.choose(choice)) {
+            permissionLauncher.launch(choice.permission)
+        }
+        refreshTick++
+    }
+    val ankiLabel = ankiApp?.let { app.anki.label(it) } ?: stringResource(R.string.anki_section)
 
     Box(
         modifier = Modifier
@@ -123,7 +142,9 @@ private fun HomeScreen(app: App, navController: NavHostController) {
         ) {
             item { Masthead() }
             item { WatchCard(ciqState, devices) }
-            item { AnkiCard(ankiAvailable, ankiPermitted, settings, permissionLauncher) }
+            item {
+                AnkiCard(appState, ankiLabel, ankiPermitted, settings, appOptions, onChoose, permissionLauncher)
+            }
 
             if (ankiPermitted) {
                 item {
@@ -162,9 +183,9 @@ private fun HomeScreen(app: App, navController: NavHostController) {
             }
 
             item {
-                CustomStudyFooter {
+                CustomStudyFooter(ankiLabel) {
                     context.packageManager
-                        .getLaunchIntentForPackage(FlashCards.ANKIDROID_PACKAGE)
+                        .getLaunchIntentForPackage((ankiApp ?: FlashcardApp.DEFAULT).packageName)
                         ?.let { context.startActivity(it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
                 }
             }
@@ -462,28 +483,56 @@ private fun WatchCard(state: CiqState, devices: List<WatchDevice>) {
     }
 }
 
+/** One installed flashcard app as the picker shows it. */
+private class AppOption(val app: FlashcardApp, val label: String, val icon: ImageBitmap?)
+
+private fun appOptions(app: App, state: FlashcardAppState): List<AppOption> {
+    val candidates = when (state) {
+        FlashcardAppState.NoneInstalled, FlashcardAppState.Unverified -> emptyList()
+        is FlashcardAppState.NeedsChoice -> state.candidates
+        is FlashcardAppState.Ready -> state.candidates
+    }
+    return candidates.map { AppOption(it, app.anki.label(it), app.anki.icon(it)?.toBitmap()?.asImageBitmap()) }
+}
+
 @Composable
 private fun AnkiCard(
-    ankiAvailable: Boolean,
+    appState: FlashcardAppState,
+    ankiLabel: String,
     ankiPermitted: Boolean,
     settings: Settings?,
+    options: List<AppOption>,
+    onChoose: (FlashcardApp) -> Unit,
     permissionLauncher: ActivityResultLauncher<String>,
 ) {
-    SectionCard(stringResource(R.string.anki_section)) {
+    val ready = appState as? FlashcardAppState.Ready
+    SectionCard(ankiLabel) {
         when {
-            !ankiAvailable -> Text(
+            appState is FlashcardAppState.NoneInstalled -> Text(
                 stringResource(R.string.anki_missing),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.error,
             )
+            // AnkiDroid's authority answered, but not with AnkiDroid's release key.
+            appState is FlashcardAppState.Unverified -> Text(
+                stringResource(R.string.anki_untrusted),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error,
+            )
+            // AnkiDroid missing or a pin broke: never pick silently.
+            appState is FlashcardAppState.NeedsChoice -> Text(
+                stringResource(R.string.flashcard_app_choose),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
             !ankiPermitted -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(
-                    stringResource(R.string.anki_no_permission),
+                    stringResource(R.string.anki_no_permission, ankiLabel),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Button(
-                    onClick = { permissionLauncher.launch(FlashCards.READ_WRITE_PERMISSION) },
+                    onClick = { ready?.let { permissionLauncher.launch(it.app.permission) } },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(stringResource(R.string.anki_grant))
@@ -558,6 +607,11 @@ private fun AnkiCard(
                 }
             }
         }
+
+        // Picker: during setup, and in settings once there is a second app.
+        if (ready == null || options.size > 1) {
+            FlashcardAppPicker(options, ready?.app, onChoose)
+        }
     }
 }
 
@@ -628,15 +682,55 @@ private fun PushStatusLog(status: PushStatus) {
 }
 
 @Composable
-private fun CustomStudyFooter(onOpen: () -> Unit) {
+private fun FlashcardAppPicker(
+    options: List<AppOption>,
+    selected: FlashcardApp?,
+    onChoose: (FlashcardApp) -> Unit,
+) {
+    if (options.isEmpty()) {
+        return
+    }
+
+    Text(
+        stringResource(R.string.flashcard_app),
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    options.forEach { option ->
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .selectable(
+                    selected = option.app == selected,
+                    onClick = { onChoose(option.app) },
+                    role = Role.RadioButton,
+                ),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            RadioButton(selected = option.app == selected, onClick = null)
+            option.icon?.let {
+                Image(it, contentDescription = null, modifier = Modifier.padding(start = 12.dp).size(32.dp))
+            }
+            Text(
+                option.label,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(start = 12.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun CustomStudyFooter(ankiLabel: String, onOpen: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text(
-            stringResource(R.string.custom_study_hint),
+            stringResource(R.string.custom_study_hint, ankiLabel),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         OutlinedButton(onClick = onOpen, modifier = Modifier.fillMaxWidth()) {
-            Text(stringResource(R.string.open_ankidroid))
+            Text(stringResource(R.string.open_ankidroid, ankiLabel))
         }
     }
 }
