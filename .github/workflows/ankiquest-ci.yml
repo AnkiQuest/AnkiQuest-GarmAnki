@@ -15,6 +15,6 @@ permissions:
 
 jobs:
   ci:
-    uses: AnkiQuest/AnkiQuest-Dev/.github/workflows/android-ci.yml@master
+    uses: AnkiQuest/AnkiQuest-Dev/.github/workflows/android-ci.yml@main
     with:
       working-directory: android
