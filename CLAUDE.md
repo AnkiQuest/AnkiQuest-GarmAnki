@@ -1,3 +1,5 @@
+@AGENTS.md
+
 # CLAUDE.md — garmanki
 
 Unofficial Anki client for Garmin watches: Connect IQ watch-app +
