@@ -1,36 +1,20 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Builds and tests the Android companion on every pull request and on master.
 # The watch app is not built: the Connect IQ SDK is not freely downloadable.
+# The jobs are AnkiQuest-Dev's shared android-ci workflow.
 name: ankiquest CI
 
 on:
   push:
     branches: [master]
   pull_request:
+  merge_group:
 
 permissions:
   contents: read
 
 jobs:
-  gradle:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: android
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
-        with:
-          distribution: temurin
-          java-version: "17"
-      - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
-      - run: ./gradlew assembleDebug lintDebug testDebugUnitTest
-
-  # The flake's formatting check, and a debug build inside its dev shell.
-  nix:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: cachix/install-nix-action@3dc140bfc76c49fbd4dd958429132e3746bcb086 # v31
-      - run: nix flake check
-      - run: nix develop -c sh -c 'cd android && ./gradlew assembleDebug'
+  ci:
+    uses: AnkiQuest/AnkiQuest-Dev/.github/workflows/android-ci.yml@master
+    with:
+      working-directory: android

@@ -2,8 +2,8 @@
 # Builds a debug APK on every push to master and publishes it as the
 # "nightly" pre-release, replacing the previous one. The newest build is
 # always at
-#   https://github.com/AnkiQuest/garmankiquest/releases/download/nightly/garmankiquest-nightly.apk
-# Tagged releases are separate and untouched.
+#   https://github.com/AnkiQuest/AnkiQuest-GarmAnki/releases/download/nightly/AnkiQuest-GarmAnki-nightly.apk
+# The job is AnkiQuest-Dev's shared android-nightly workflow.
 name: Nightly
 
 on:
@@ -20,51 +20,12 @@ permissions:
   contents: read
 
 jobs:
-  apk:
-    name: Nightly APK
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
+  nightly:
+    uses: AnkiQuest/AnkiQuest-Dev/.github/workflows/android-nightly.yml@master
     permissions:
       contents: write
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
-        with:
-          distribution: temurin
-          java-version: "17"
-      - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
-        with:
-          cache-provider: basic
-
-      # Debug builds are signed with ~/.android/debug.keystore. Every runner
-      # makes a new one, and Android refuses to install an update signed with
-      # a different key, so a fixed key comes from this secret. Without it the
-      # build still works, but each nightly must be uninstalled first.
-      - name: Use the nightly signing key
-        env:
-          KEYSTORE: ${{ secrets.NIGHTLY_DEBUG_KEYSTORE }}
-        run: |
-          if [ -z "$KEYSTORE" ]; then
-            echo "::warning::NIGHTLY_DEBUG_KEYSTORE is not set: this APK will not install over the previous nightly"
-            exit 0
-          fi
-          mkdir -p ~/.android
-          printf '%s' "$KEYSTORE" | base64 --decode > ~/.android/debug.keystore
-
-      - name: Build debug APK
-        working-directory: android
-        run: ./gradlew :app:assembleDebug --no-daemon
-
-      - name: Publish the nightly release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          short="${GITHUB_SHA::7}"
-          cp "android/app/build/outputs/apk/debug/app-debug.apk" "garmankiquest-nightly.apk"
-          sha256sum "garmankiquest-nightly.apk" > SHA256SUMS.txt
-          gh release delete nightly --cleanup-tag --yes || true
-          gh release create nightly "garmankiquest-nightly.apk" SHA256SUMS.txt \
-            --prerelease \
-            --target "$GITHUB_SHA" \
-            --title "Nightly ($short)" \
-            --notes "Debug build of $GITHUB_SHA from master, built $(date -u '+%Y-%m-%d %H:%M UTC'). Replaced on every push to master."
+    with:
+      name: AnkiQuest-GarmAnki
+      working-directory: android
+    secrets:
+      NIGHTLY_DEBUG_KEYSTORE: ${{ secrets.NIGHTLY_DEBUG_KEYSTORE }}
