@@ -27,7 +27,7 @@ cd watch && monkeyc -f monkey.jungle -d fr965 -o bin/garmanki.prg -y developer_k
 # android
 cd android && ./gradlew assembleRelease lint testDebugUnitTest
 
-# android via Nix (JDK 17 + Android SDK from flake.nix; format with alejandra)
+# android via Nix (JBR 21 + Android SDK from AnkiQuest-Dev's android shell; format with alejandra)
 nix develop -c sh -c 'cd android && ./gradlew assembleDebug'
 nix fmt
 ```
