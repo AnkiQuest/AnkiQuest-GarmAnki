@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 package app.sypianski.garmanki
 
 import app.sypianski.garmanki.anki.FlashcardApp

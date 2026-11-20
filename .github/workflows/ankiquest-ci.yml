@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Builds and tests the Android companion on every pull request and on master.
 # The watch app is not built: the Connect IQ SDK is not freely downloadable.
 name: ankiquest CI

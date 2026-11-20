@@ -1,0 +1,49 @@
+AnkiQuest changes
+=================
+
+This repository is AnkiQuest's fork of sypianski/garmanki, licensed
+under the MIT License (see LICENSE). Upstream's code keeps that licence
+and its notices.
+
+AnkiQuest's additions are licensed under the GNU Affero General Public
+License, version 3 or (at your option) any later version
+(AGPL-3.0-or-later): https://www.gnu.org/licenses/agpl-3.0.html.
+
+The combined app is therefore distributed under AGPL-3.0-or-later; the
+MIT notice in LICENSE stays with upstream's files.
+
+Files added by AnkiQuest (source files carry
+`SPDX-License-Identifier: AGPL-3.0-or-later`):
+
+- .github/dependabot.yml
+- .github/workflows/ankiquest-ci.yml
+- .github/workflows/nightly.yml
+- android/app/src/main/kotlin/app/sypianski/garmanki/anki/AndroidFlashcardApps.kt
+- android/app/src/main/kotlin/app/sypianski/garmanki/anki/AndroidInstalledApps.kt
+- android/app/src/main/kotlin/app/sypianski/garmanki/anki/FlashcardApp.kt
+- android/app/src/main/kotlin/app/sypianski/garmanki/anki/ProviderCheck.kt
+- android/app/src/test/kotlin/app/sypianski/garmanki/FlashcardAppManifestTest.kt
+- android/app/src/test/kotlin/app/sypianski/garmanki/FlashcardAppResolverTest.kt
+- android/app/src/test/kotlin/app/sypianski/garmanki/ProviderCheckTest.kt
+- decyzje/PC-004-ankiquest-jako-druga-aplikacja-z-fiszkami.md
+- flake.lock
+- flake.nix
+
+Upstream files with AnkiQuest changes. The changes are
+AGPL-3.0-or-later; the rest of each file keeps upstream's licence.
+`git log` shows which lines are ours:
+
+- CLAUDE.md
+- README.md
+- SCHEMA.md
+- android/app/build.gradle.kts
+- android/app/src/main/AndroidManifest.xml
+- android/app/src/main/kotlin/app/sypianski/garmanki/anki/AnkiDroidClient.kt
+- android/app/src/main/kotlin/app/sypianski/garmanki/anki/FlashCards.kt
+- android/app/src/main/kotlin/app/sypianski/garmanki/ui/MainScreen.kt
+- android/app/src/main/res/values/strings.xml
+- android/build.gradle.kts
+- android/gradle/libs.versions.toml
+
+The Gradle wrapper files (`gradlew`, `gradlew.bat`, `gradle/wrapper/`)
+are Gradle's, under the Apache License 2.0, updated by Dependabot.
