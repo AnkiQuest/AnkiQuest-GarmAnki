@@ -14,7 +14,7 @@ val keystoreProps = Properties().apply {
 
 android {
     namespace = "app.sypianski.garmanki"
-    compileSdk = 36
+    compileSdk = 37
 
     signingConfigs {
         if (keystoreProps.isNotEmpty()) {

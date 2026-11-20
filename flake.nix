@@ -15,9 +15,9 @@
       };
     };
 
-    # What android/app/build.gradle.kts compiles against; build tools are AGP 8.13's default.
-    compileSdk = "36";
-    buildTools = "35.0.0";
+    # What android/app/build.gradle.kts compiles against; build tools are AGP 9.5's default.
+    compileSdk = "37";
+    buildTools = "36.0.0";
 
     android = pkgs.androidenv.composeAndroidPackages {
       platformVersions = [compileSdk];
