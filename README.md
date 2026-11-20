@@ -83,3 +83,5 @@ See [SCHEMA.md](SCHEMA.md) for the watch↔phone data contract and
 
 [MIT](LICENSE) © 2026 Jakub Sypiański. Third-party components (the Space Mono
 font) keep their own licenses, see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+
+AnkiQuest's additions are AGPL-3.0-or-later; [NOTICE](NOTICE) lists them.

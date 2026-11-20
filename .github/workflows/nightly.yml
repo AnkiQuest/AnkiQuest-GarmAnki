@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Builds a debug APK on every push to master and publishes it as the
 # "nightly" pre-release, replacing the previous one. The newest build is
 # always at
