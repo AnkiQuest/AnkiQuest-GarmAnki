@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Builds a debug APK on every push to master and publishes it as the
-# "nightly" pre-release, replacing the previous one. The newest build is
-# always at
-#   https://github.com/AnkiQuest/AnkiQuest-GarmAnki/releases/download/nightly/AnkiQuest-GarmAnki-nightly.apk
-# The job is AnkiQuest-Dev's shared android-nightly workflow.
+# Builds debug APKs on every push to master, one per ABI and a universal one,
+# and publishes them as the "nightly" pre-release, replacing the previous one.
+# The newest builds are always at
+#   https://github.com/AnkiQuest/AnkiQuest-GarmAnki/releases/download/nightly/AnkiQuest-GarmAnki-nightly-<abi>.apk
+# for arm64-v8a, armeabi-v7a, x86_64, x86 and universal.
+# The job is AnkiQuest-Dev's shared android-release workflow.
 name: Nightly
 
 on:
@@ -21,11 +22,12 @@ permissions:
 
 jobs:
   nightly:
-    uses: AnkiQuest/AnkiQuest-Dev/.github/workflows/android-nightly.yml@master
+    uses: AnkiQuest/AnkiQuest-Dev/.github/workflows/android-release.yml@master
     permissions:
       contents: write
     with:
       name: AnkiQuest-GarmAnki
       working-directory: android
+      gradle-args: -PabiSplits=true
     secrets:
-      NIGHTLY_DEBUG_KEYSTORE: ${{ secrets.NIGHTLY_DEBUG_KEYSTORE }}
+      DEBUG_KEYSTORE: ${{ secrets.NIGHTLY_DEBUG_KEYSTORE }}
