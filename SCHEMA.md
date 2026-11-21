@@ -142,7 +142,11 @@ If `front` ends up empty → skip the card and count it as `skipped`
   AnkiDroid (default, used without asking) and AnkiQuest
   (`org.ankiquest.anki`, authority `org.ankiquest.anki.flashcards`,
   permission `org.ankiquest.anki.permission.READ_WRITE_DATABASE`,
-  opt-in).
+  opt-in). Released AnkiQuest builds still install as
+  `com.ichi2.anki.quest` (authority `com.ichi2.anki.quest.flashcards`,
+  permission `com.ichi2.anki.quest.permission.READ_WRITE_DATABASE`);
+  that package is a third entry with the same rule, until
+  AnkiQuest-Android#420 has moved its users to `org.ankiquest.anki`.
 - Provider check (`anki/ProviderCheck.kt`), before every call: the
   authority must be held by the app's package, and one of its signing
   certificates (rotation history included) must match its key.
