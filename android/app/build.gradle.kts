@@ -57,6 +57,17 @@ android {
         compose = true
         buildConfig = true
     }
+
+    // AnkiQuest: -PabiSplits=true builds one APK per ABI and a universal one,
+    // as AnkiQuest-Dev's android-release workflow publishes them.
+    splits {
+        abi {
+            isEnable = providers.gradleProperty("abiSplits").orNull == "true"
+            reset()
+            include("arm64-v8a", "armeabi-v7a", "x86_64", "x86")
+            isUniversalApk = true
+        }
+    }
 }
 
 // AGP 9 compiles Kotlin itself; its compiler options live here, not in android {}.
