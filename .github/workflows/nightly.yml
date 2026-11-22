@@ -7,9 +7,16 @@
 # The job is AnkiQuest-Dev's shared android-release workflow.
 name: Nightly
 
+# A docs-only push changes no APK and builds nothing.
 on:
   push:
     branches: [master]
+    paths-ignore:
+      - "**.md"
+      - "LICENSE*"
+      - "LICENSES/**"
+      - "docs/**"
+      - ".github/ISSUE_TEMPLATE/**"
   workflow_dispatch:
 
 # A newer push replaces a nightly that is still building.
