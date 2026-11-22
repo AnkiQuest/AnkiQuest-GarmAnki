@@ -13,8 +13,31 @@ on:
 permissions:
   contents: read
 
+# A newer push to a pull request replaces its run; pushes to master and merge
+# queue entries each keep theirs.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
+  # Whether anything besides documentation changed; a docs-only change (the
+  # READMEs, SCHEMA.md, decision records, backlog/) skips the build, which
+  # reads no Markdown or licence text.
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      code: ${{ steps.changed.outputs.code }}
+    steps:
+      - id: changed
+        uses: AnkiQuest/AnkiQuest-Dev/.github/actions/code-changed@5ab685e7013b865630f96530ca8c654344738fa8
+
   ci:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     uses: AnkiQuest/AnkiQuest-Dev/.github/workflows/android-ci.yml@master
     with:
       working-directory: android
