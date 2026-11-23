@@ -1,4 +1,7 @@
-# garmanki
+# AnkiQuest-GarmAnki
+
+AnkiQuest's fork of [sypianski/garmanki](https://github.com/sypianski/garmanki);
+everything below is upstream's README.
 
 Unofficial Anki client for Garmin watches: a Connect IQ watch-app plus
 an Android companion that bridges to [AnkiDroid](https://github.com/ankidroid/Anki-Android)
