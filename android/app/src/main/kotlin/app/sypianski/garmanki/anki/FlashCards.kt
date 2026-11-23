@@ -3,10 +3,10 @@ package app.sypianski.garmanki.anki
 import android.net.Uri
 
 /**
- * Constants re-declared from AnkiDroid's FlashCardsContract to avoid a
- * library dependency. Literals verified against
- * https://github.com/ankidroid/Anki-Android/blob/main/api/src/main/java/com/ichi2/anki/FlashCardsContract.kt
- * (2026-07-22).
+ * Constants re-declared from the FlashCardsContract to avoid a
+ * library dependency. Literals verified against AnkiQuest's AnkiDroid fork:
+ * https://github.com/AnkiQuest/AnkiQuest-Android/blob/master/api/src/main/java/com/ichi2/anki/FlashCardsContract.kt
+ * (fork commit bd339154fb535bfd386f0811711f9fae07c8de0a, 2026-11-18).
  */
 object FlashCards {
     /** Same action in AnkiDroid and AnkiQuest; sent to the chosen app's package. */
