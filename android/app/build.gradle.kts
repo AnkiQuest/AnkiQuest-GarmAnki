@@ -13,7 +13,7 @@ val keystoreProps = Properties().apply {
 }
 
 android {
-    namespace = "app.sypianski.garmanki"
+    namespace = "org.ankiquest.garmanki"
     compileSdk = 37
 
     signingConfigs {
@@ -28,7 +28,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "dev.sypianski.garmanki"
+        applicationId = "org.ankiquest.garmanki"
         minSdk = 26
         targetSdk = 36
         versionCode = 16
