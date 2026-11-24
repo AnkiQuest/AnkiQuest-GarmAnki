@@ -191,3 +191,115 @@ AnkiQuest-GarmAnki is a fork of [sypianski/garmanki](https://github.com/sypiansk
 - **Languages.** Monkey C and Kotlin, as upstream.
 - **Releases** to the Connect IQ Store are upstream's; don't submit from this fork.
 - **Checks to run** before pushing: `cd android && ./gradlew lint testDebugUnitTest`, and `nix flake check` for Nix changes.
+
+## Upstream guidance
+
+From [sypianski/garmanki](https://github.com/sypianski/garmanki)'s CLAUDE.md, kept here so the fork still follows the originating project's own rules where AnkiQuest's do not override them; this job refreshes the wording when upstream changes it.
+
+# CLAUDE.md — garmanki
+
+Unofficial Anki client for Garmin watches: Connect IQ watch-app +
+Android companion that bridges to **AnkiDroid** (ContentProvider API)
+over Connect IQ BLE messaging. The scheduler stays in AnkiDroid — the
+watch only shows cards and reports (ease, timeTaken).
+
+**The data contract lives in [SCHEMA.md](SCHEMA.md) — read it before
+touching either client.** Product decisions: [DECYZJE.md](DECYZJE.md).
+Architecture patterns are deliberately mirrored from
+`~/utensili/notes_and_codes` (chunked BLE push + ack, rev-based state).
+
+## Layout
+
+| Dir | What | Stack |
+|---|---|---|
+| `watch/` | Connect IQ app (77 hw variants incl. fenix6 Pro-class, vivoactive4; minApiLevel 3.3.0) | Monkey C, SDK 9.x |
+| `android/` | companion — AnkiDroid bridge + BLE push | Kotlin, Compose M3, CIQ Mobile SDK 2.4.0 |
+
+## Commands
+
+```bash
+# watch (SDK not on PATH)
+export PATH="$HOME/connectiq-sdk/connectiq-sdk-lin-9.2.0/bin:$PATH"
+cd watch && monkeyc -f monkey.jungle -d fr965 -o bin/garmanki.prg -y developer_key
+
+# android
+cd android && ./gradlew assembleRelease lint testDebugUnitTest
+```
+
+## Connect IQ Store
+
+- **Public listing** — store app id
+  `f3cb31bc-f5d9-4818-b730-4c67e98e3b7a`
+  (https://apps.garmin.com/apps/f3cb31bc-f5d9-4818-b730-4c67e98e3b7a):
+  status APPROVED, not beta, reachable without login; first approved
+  2026-07-24; store version 1.2.3 = `AppVersion` (checked 2026-10-12 on
+  the public page; manifest UUID `af46d10eb5a3438082598ff6b6c7ffed`).
+  Keep the store version >= `AppVersion` when releasing.
+  1.3.0 (TASK-28, watch redesign) submitted via /update on 2026-10-23; the
+  public page showed Version 1.3.0 (status Preview) on 2026-10-25.
+  1.3.1 (TASK-38, vivoactive4/4s) submitted via /update on 2026-10-27
+  (PUT 204), before the fr965 regression check; live by 2026-10-29 (public
+  API: latestExternalVersion 1.3.1, vivoactive4/4s part numbers listed).
+  1.3.2 (TASK-39/40/41/43/44: Options under BACK with Undo, gestures,
+  sample deck, What's new screen, no lost answers after restart) submitted
+  via /update on 2026-10-29 together with the new cover image (TASK-42,
+  icon variant B); /update shows "Latest app version: 1.3.2", pending
+  Garmin approval. Export the .iq on the Mac WITHOUT `-r` — release mode
+  crashes monkeyc 9.2 ("Generating code for unsupported operation 'null'"),
+  also on 1.3.1 code.
+  Listing description edited via /edit on 2026-10-25 (Limitations paragraph,
+  TASK-30); the public page shows it only after Garmin approves.
+  1.2.3 (TASK-26) adds fenix6pro/6spro/6xpro; submitted and live the same
+  day (2026-10-12). Plain fenix6/fenix6s (128 KB app RAM) are deliberately
+  NOT supported yet.
+- Old beta 0.1.0 uploaded 2026-07-22: store app id
+  `cc2be8ee-1ea5-4797-b8b0-eb7109d93855`
+  (https://apps.garmin.com/apps/cc2be8ee-1ea5-4797-b8b0-eb7109d93855) —
+  visible only to the developer account, "Beta Apps" section of the
+  dashboard; install via the Connect IQ app on the phone.
+- ⚠️ Garmin: a beta upload permanently claims the manifest appID. Public
+  release later = NEW UUID in `watch/manifest.xml` + `android/…/ciq/WatchApp.kt`.
+
+## Gotchas
+
+- `watch/developer_key` and `android/keystore.properties` are gitignored.
+- Watch app UUID `b1b0cef8a5b246af9c8ea2951c2d6bba` appears in
+  `watch/manifest.xml` AND `android/…/ciq/*` — keep in sync.
+- `minApiLevel` is 3.3.0 (vivoactive4/4s), but ActionMenu, showToast and
+  getCurrentView are API 3.4 — monkeyc does NOT flag symbols above a device's
+  API level. 3.4-only calls live in `source/ui/Compat.mc` as `(:modern)`;
+  API 3.3 devices get `(:legacy)` via `excludeAnnotations` in monkey.jungle.
+  Check "Since: API Level" in the SDK docs for any new Toybox call.
+- Anki ids travel as **strings** (64-bit epoch-ms; Monkey C Number is
+  32-bit) — never parse them to Int on the watch.
+- Built-in Garmin fonts (Roboto) cover Latin/Polish, modern Greek and plain
+  Arabic (joins, RTL — measured on fr965, D6 update / PC-003). Not covered:
+  Arabic harakat unless shaped to presentation forms in the companion
+  (TASK-35), polytonic Greek and rare Latin letters (TASK-36), CJK. Combining
+  marks are unreliable — send NFC. Companion must strip HTML per SCHEMA.md §6.
+- Deleting from the watch is a soft delete (suspend + tag
+  `garmanki-delete`) — never hard-delete notes from the companion.
+
+<!-- BACKLOG.MD GUIDELINES START -->
+<!-- backlog.md-instructions-version: 1.48.0 -->
+<CRITICAL_INSTRUCTION>
+
+## Backlog.md Workflow
+
+This project uses Backlog.md for task and project management.
+
+**For every user request in this project, run `backlog instructions overview` before answering or taking action.**
+
+Use the overview to decide whether to search, read, create, or update Backlog tasks.
+
+Before task lifecycle actions, read the matching detailed guide:
+- `backlog instructions task-creation` before creating or splitting tasks
+- `backlog instructions task-execution` before planning, changing status or assignee, adding a plan or implementation notes, or implementing task work
+- `backlog instructions task-finalization` before checking acceptance criteria, writing final summaries, or moving tasks to terminal statuses
+
+Use `backlog <command> --help` before running unfamiliar commands. Help shows options, fields, and examples.
+
+Do not edit Backlog task, draft, document, decision, or milestone markdown files directly. Use the `backlog` CLI so metadata, relationships, and history stay consistent.
+
+</CRITICAL_INSTRUCTION>
+<!-- BACKLOG.MD GUIDELINES END -->
