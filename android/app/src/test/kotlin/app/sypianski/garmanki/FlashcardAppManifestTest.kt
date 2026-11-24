@@ -23,13 +23,13 @@ class FlashcardAppManifestTest {
         }
     }
 
-    /** Every AnkiQuest build installs as org.ankiquest (AnkiQuest-Android#461). */
+    /** Every AnkiQuest build installs as org.ankiquest.ankidroid (AnkiQuest-Android#461). */
     @Test
     fun `AnkiQuest is org dot ankiquest`() {
         val app = FlashcardApp.ANKIQUEST
 
-        assertEquals("org.ankiquest", app.packageName)
-        assertEquals("org.ankiquest.flashcards", app.authority)
-        assertEquals("org.ankiquest.permission.READ_WRITE_DATABASE", app.permission)
+        assertEquals("org.ankiquest.ankidroid", app.packageName)
+        assertEquals("org.ankiquest.ankidroid.flashcards", app.authority)
+        assertEquals("org.ankiquest.ankidroid.permission.READ_WRITE_DATABASE", app.permission)
     }
 }
