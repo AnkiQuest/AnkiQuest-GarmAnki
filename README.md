@@ -15,9 +15,11 @@ watch only shows cards and reports back how you did.
 
 Publicly released:
 
-- **Android companion** (v1.0.5) —
-  [Google Play](https://play.google.com/store/apps/details?id=org.ankiquest.garmanki)
-- **Watch app** (v1.3.0) —
+- **Android companion** (v1.0.5) — upstream's listing on
+  [Google Play](https://play.google.com/store/apps/details?id=dev.sypianski.garmanki);
+  AnkiQuest releases of `org.ankiquest.garmanki` are coming to
+  [Releases](https://github.com/AnkiQuest/AnkiQuest-GarmAnki/releases)
+- **Watch app** (v1.3.0) — upstream's listing on the
   [Connect IQ Store](https://apps.garmin.com/apps/f3cb31bc-f5d9-4818-b730-4c67e98e3b7a)
 
 garmanki is an independent project, not affiliated with Anki, AnkiDroid
@@ -76,8 +78,9 @@ Plain fēnix 6 / 6S (128 KB app RAM) are **not** supported yet.
 | `android/` | companion — AnkiDroid bridge + BLE push | Kotlin, Compose M3, CIQ Mobile SDK 2.4.0 |
 
 See [SCHEMA.md](SCHEMA.md) for the watch↔phone data contract and
-[DECYZJE.md](DECYZJE.md) for product decisions. The source is public:
-<https://github.com/sypianski/garmanki>.
+[DECYZJE.md](DECYZJE.md) for product decisions. This is AnkiQuest's fork of
+[sypianski/garmanki](https://github.com/sypianski/garmanki); the source is
+<https://github.com/AnkiQuest/AnkiQuest-GarmAnki>.
 
 ## License
 
