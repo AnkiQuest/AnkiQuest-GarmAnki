@@ -16,7 +16,7 @@ watch only shows cards and reports back how you did.
 Publicly released:
 
 - **Android companion** (v1.0.5) —
-  [Google Play](https://play.google.com/store/apps/details?id=dev.sypianski.garmanki)
+  [Google Play](https://play.google.com/store/apps/details?id=org.ankiquest.garmanki)
 - **Watch app** (v1.3.0) —
   [Connect IQ Store](https://apps.garmin.com/apps/f3cb31bc-f5d9-4818-b730-4c67e98e3b7a)
 
