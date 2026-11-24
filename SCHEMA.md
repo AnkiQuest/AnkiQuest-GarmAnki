@@ -140,13 +140,13 @@ If `front` ends up empty → skip the card and count it as `skipped`
   (`schedule` with `deckID`/`limit` selection) + per-card Q/A render.
 - Flashcard app (PC-004): closed list in `anki/FlashcardApp.kt` —
   AnkiDroid (default, used without asking) and AnkiQuest
-  (`org.ankiquest`, authority `org.ankiquest.flashcards`,
-  permission `org.ankiquest.permission.READ_WRITE_DATABASE`,
+  (`org.ankiquest.ankidroid`, authority `org.ankiquest.ankidroid.flashcards`,
+  permission `org.ankiquest.ankidroid.permission.READ_WRITE_DATABASE`,
   opt-in). Released AnkiQuest builds still install as
   `com.ichi2.anki.quest` (authority `com.ichi2.anki.quest.flashcards`,
   permission `com.ichi2.anki.quest.permission.READ_WRITE_DATABASE`);
   that package is a third entry with the same rule, until
-  AnkiQuest-Android#420 has moved its users to `org.ankiquest`.
+  AnkiQuest-Android#420 has moved its users to `org.ankiquest.ankidroid`.
 - Provider check (`anki/ProviderCheck.kt`), before every call: the
   authority must be held by the app's package, and one of its signing
   certificates (rotation history included) must match its key.

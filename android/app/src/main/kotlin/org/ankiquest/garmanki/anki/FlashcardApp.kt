@@ -20,15 +20,15 @@ enum class FlashcardApp(
         SigningKey.BuiltIn(ANKIDROID_KEYS),
     ),
     ANKIQUEST(
-        "org.ankiquest",
-        "org.ankiquest.flashcards",
-        "org.ankiquest.permission.READ_WRITE_DATABASE",
+        "org.ankiquest.ankidroid",
+        "org.ankiquest.ankidroid.flashcards",
+        "org.ankiquest.ankidroid.permission.READ_WRITE_DATABASE",
         SigningKey.PinnedOnChoice,
     ),
 
     /**
      * The package released AnkiQuest builds install as today. Remove once
-     * its users have moved to org.ankiquest (AnkiQuest-Android#420).
+     * its users have moved to org.ankiquest.ankidroid (AnkiQuest-Android#420).
      */
     ANKIQUEST_RELEASED(
         "com.ichi2.anki.quest",
