@@ -31,7 +31,7 @@ jobs:
   nightly:
     uses: AnkiQuest/AnkiQuest-Dev/.github/workflows/android-release.yml@master
     permissions:
-      contents: write
+      contents: write # replaces the nightly release and its tag
     with:
       name: AnkiQuest-GarmAnki
       working-directory: android
