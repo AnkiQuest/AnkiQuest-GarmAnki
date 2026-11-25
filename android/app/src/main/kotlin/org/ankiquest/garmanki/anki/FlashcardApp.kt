@@ -25,17 +25,6 @@ enum class FlashcardApp(
         "org.ankiquest.ankidroid.permission.READ_WRITE_DATABASE",
         SigningKey.PinnedOnChoice,
     ),
-
-    /**
-     * The package released AnkiQuest builds install as today. Remove once
-     * its users have moved to org.ankiquest.ankidroid (AnkiQuest-Android#420).
-     */
-    ANKIQUEST_RELEASED(
-        "com.ichi2.anki.quest",
-        "com.ichi2.anki.quest.flashcards",
-        "com.ichi2.anki.quest.permission.READ_WRITE_DATABASE",
-        SigningKey.PinnedOnChoice,
-    ),
     ;
 
     companion object {

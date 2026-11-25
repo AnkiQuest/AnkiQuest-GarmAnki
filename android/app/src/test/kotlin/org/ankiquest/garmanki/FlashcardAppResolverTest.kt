@@ -19,7 +19,6 @@ class FlashcardAppResolverTest {
 
     private val ankiDroid = FlashcardApp.ANKIDROID
     private val ankiQuest = FlashcardApp.ANKIQUEST
-    private val ankiQuestReleased = FlashcardApp.ANKIQUEST_RELEASED
 
     /** package → signer digests; authority → holding package. */
     private class FakeInstalled : InstalledApps {
@@ -76,28 +75,6 @@ class FlashcardAppResolverTest {
 
         assertTrue(resolver.choose(ankiQuest))
         assertEquals(FlashcardAppState.Ready(ankiQuest, listOf(ankiQuest)), resolver.resolve())
-    }
-
-    @Test
-    fun `released AnkiQuest only needs an explicit choice`() {
-        installed.install(ankiQuestReleased, "aq-released")
-
-        assertEquals(FlashcardAppState.NeedsChoice(listOf(ankiQuestReleased)), resolver.resolve())
-
-        assertTrue(resolver.choose(ankiQuestReleased))
-        assertEquals(FlashcardAppState.Ready(ankiQuestReleased, listOf(ankiQuestReleased)), resolver.resolve())
-    }
-
-    @Test
-    fun `both AnkiQuest packages installed are both offered`() {
-        installed.install(ankiQuest, "aq")
-        installed.install(ankiQuestReleased, "aq-released")
-        val both = listOf(ankiQuest, ankiQuestReleased)
-
-        assertEquals(FlashcardAppState.NeedsChoice(both), resolver.resolve())
-
-        assertTrue(resolver.choose(ankiQuestReleased))
-        assertEquals(FlashcardAppState.Ready(ankiQuestReleased, both), resolver.resolve())
     }
 
     @Test
