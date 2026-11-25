@@ -8,7 +8,12 @@ updates:
     groups:
       gradle:
         patterns: ["*"]
+    cooldown:
+      default-days: 7
 
+  # The commit SHAs third-party actions are pinned to. AnkiQuest's own
+  # workflows and actions stay at master; a release gets a week before it
+  # is proposed, so a bad or compromised one has time to be pulled.
   - package-ecosystem: github-actions
     directory: /
     schedule:
@@ -16,6 +21,12 @@ updates:
     groups:
       githubactions:
         patterns: ["*"]
+    cooldown:
+      default-days: 7
+    ignore:
+      - dependency-name: AnkiQuest/*
+    commit-message:
+      prefix: ci
 
   - package-ecosystem: nix
     directory: /
@@ -24,3 +35,5 @@ updates:
     groups:
       nix:
         patterns: ["*"]
+    cooldown:
+      default-days: 7
