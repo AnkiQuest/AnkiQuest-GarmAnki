@@ -4,14 +4,18 @@
     <!-- Talk to the AnkiDroid or AnkiQuest ContentProvider (SCHEMA.md §7, anki/FlashcardApp.kt). -->
     <uses-permission android:name="com.ichi2.anki.permission.READ_WRITE_DATABASE" />
     <uses-permission android:name="org.ankiquest.ankidroid.permission.READ_WRITE_DATABASE" />
+    <!-- Released AnkiQuest; remove once AnkiQuest-Android#420 has moved its users. -->
+    <uses-permission android:name="com.ichi2.anki.quest.permission.READ_WRITE_DATABASE" />
 
     <!-- Android 11+ package visibility: AnkiDroid, AnkiQuest + Garmin Connect Mobile. -->
     <queries>
         <package android:name="com.ichi2.anki" />
         <package android:name="org.ankiquest.ankidroid" />
+        <package android:name="com.ichi2.anki.quest" />
         <package android:name="com.garmin.android.apps.connectmobile" />
         <provider android:authorities="com.ichi2.anki.flashcards" />
         <provider android:authorities="org.ankiquest.ankidroid.flashcards" />
+        <provider android:authorities="com.ichi2.anki.quest.flashcards" />
     </queries>
 
     <application
