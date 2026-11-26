@@ -206,7 +206,9 @@ AnkiQuest-GarmAnki is a fork of [sypianski/garmanki](https://github.com/sypiansk
 
 ## Upstream guidance
 
-From [sypianski/garmanki](https://github.com/sypianski/garmanki)'s CLAUDE.md, kept here so the fork still follows the originating project's own rules where AnkiQuest's do not override them; this job refreshes the wording when upstream changes it.
+[sypianski/garmanki](https://github.com/sypianski/garmanki)'s own instructions, kept verbatim. The rules above override them; where they don't, they apply to upstream's code. AnkiQuest-Sync copies them from the upstream commit `master` last merged; don't edit them here.
+
+<!-- sypianski/garmanki: CLAUDE.md -->
 
 # CLAUDE.md — garmanki
 
